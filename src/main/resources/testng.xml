@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+
+<suite name="BlazeDemo Functional Test Suite">
+
+    <test name="BookFlightTests">
+        <classes>
+            <class name="com.blazeDemo.tests.TestDestinationOfTheWeekPage"/>
+            <class name="com.blazeDemo.tests.TestHomePage"/>
+            <class name="com.blazeDemo.tests.TestFlightReservation"/>
+
+        </classes>
+    </test>
+
+</suite>
