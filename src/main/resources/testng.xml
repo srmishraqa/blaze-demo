@@ -3,14 +3,17 @@
 
 
 <suite name="BlazeDemo Functional Test Suite">
+    <listeners>
+        <listener class-name="com.blazeDemo.reporting.ExtentReportListener"/>
+    </listeners>
 
     <test name="BookFlightTests">
         <classes>
             <class name="com.blazeDemo.tests.TestDestinationOfTheWeekPage"/>
             <class name="com.blazeDemo.tests.TestHomePage"/>
             <class name="com.blazeDemo.tests.TestFlightReservation"/>
-
         </classes>
     </test>
 
 </suite>
+

@@ -5,7 +5,9 @@ import com.blazeDemo.pages.FlightReservationFillUpPage;
 import com.blazeDemo.pages.FlightReservationPage;
 import com.blazeDemo.pages.HomePage;
 import com.blazeDemo.pages.ReservationConfirmationPage;
+import com.blazeDemo.util.ExcelConnector;
 import com.blazeDemo.util.TestUtil;
+import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -20,6 +22,10 @@ public class TestFlightReservation extends TestBase {
     FlightReservationFillUpPage flightReservationFillUpPage;
     ReservationConfirmationPage reservationConfirmationPage;
 
+    Logger logger = Logger.getLogger(TestFlightReservation.class);
+    ExcelConnector excelConnector = new ExcelConnector(System.getProperty("user.dir")
+            + "/src/main/java/com/blazeDemo/config/data.xlsx");
+
     public TestFlightReservation() {
         super();
     }
@@ -28,6 +34,9 @@ public class TestFlightReservation extends TestBase {
     @BeforeMethod
     public void setUp() {
         TestBase.intialization();
+        logger.info("TestBase Class Initialization method executed successfully");
+        logger.info("Opening Chrome Browser successfully");
+        logger.info("Test Execution Started");
         homePage = new HomePage();
     }
 
@@ -41,8 +50,9 @@ public class TestFlightReservation extends TestBase {
         if (res.getStatus() == ITestResult.FAILURE || res.getStatus() == ITestResult.SUCCESS) {
             TestUtil.takeScreenshotAtEndOfTest();
         }
-
+        logger.info("Test Execution Completed");
         driver.quit();
+        logger.info("Quitting the browser");
     }
 
     /**
@@ -55,18 +65,48 @@ public class TestFlightReservation extends TestBase {
     @Test
     public void testFlightReservation() {
 
-        homePage.chooseArrivalCity(prop.getProperty("departureCity"));
-        homePage.chooseDepartureCity(prop.getProperty("arrivalCity"));
-        flightReservationPage = homePage.clickOnFindFlightsBtn();
-        Assert.assertEquals(driver.getTitle(), prop.getProperty("flightReservationPageTitle"));
-        Assert.assertEquals(flightReservationPage.getFlightReservationPageHeader(), "Flights from " + prop.getProperty("departureCity") + " to " + prop.getProperty("arrivalCity") + ":");
+        homePage.chooseArrivalCity(excelConnector.getCellData
+                ("flight data", "departureCity", 2));
 
-        flightReservationFillUpPage = flightReservationPage.selectFlightByAirlineName(prop.getProperty("airLineName"));
-        Assert.assertEquals(driver.getTitle(), prop.getProperty("reservationFillUpPageTitle"));
-        flightReservationFillUpPage.fillFlightDetails(prop.getProperty("name"), prop.getProperty("address"), prop.getProperty("city"), prop.getProperty("state"), prop.getProperty("zipCode"), prop.getProperty("cardType"), prop.getProperty("cardNum"), prop.getProperty("month"), prop.getProperty("year"), prop.getProperty("nameOnTheCard"), prop.getProperty("rememberMeFlag"));
+        homePage.chooseDepartureCity(excelConnector.getCellData
+                ("flight data", "arrivalCity", 2));
+
+        flightReservationPage = homePage.clickOnFindFlightsBtn();
+
+        Assert.assertEquals(driver.getTitle(), excelConnector.getCellData
+                ("validation points", "flightReservationPageTitle", 2));
+        logger.info("Page Title asserted successfully");
+
+        Assert.assertEquals(flightReservationPage.getFlightReservationPageHeader(), "Flights from " +
+                excelConnector.getCellData("flight data", "departureCity", 2) + " to " +
+                excelConnector.getCellData("flight data", "arrivalCity", 2) + ":");
+        logger.info("Page Header asserted successfully");
+
+        flightReservationFillUpPage = flightReservationPage.selectFlightByAirlineName
+                (excelConnector.getCellData("flight data", "airLineName", 2));
+        Assert.assertEquals(driver.getTitle(),
+                excelConnector.getCellData("validation points", "reservationFillUpPageTitle", 2));
+        logger.info("Form Page Title asserted successfully");
+
+        flightReservationFillUpPage.fillFlightDetails(
+                excelConnector.getCellData("flight data", "name", 2),
+                excelConnector.getCellData("flight data", "address", 2),
+                excelConnector.getCellData("flight data", "city", 2),
+                excelConnector.getCellData("flight data", "state", 2),
+                excelConnector.getCellData("flight data", "zipCode", 2),
+                excelConnector.getCellData("flight data", "cardType", 2),
+                excelConnector.getCellData("flight data", "cardNum", 2),
+                excelConnector.getCellData("flight data", "month", 2),
+                excelConnector.getCellData("flight data", "year", 2),
+                excelConnector.getCellData("flight data", "nameOnTheCard", 2),
+                excelConnector.getCellData("flight data", "rememberMeFlag", 2));
+        logger.info("Form Page data filled successfully");
 
         reservationConfirmationPage = flightReservationFillUpPage.clickOnPurchaseFlightBtn();
-        Assert.assertEquals(driver.getTitle(), prop.getProperty("confirmationPageTitle"));
+        Assert.assertEquals(driver.getTitle(),
+                excelConnector.getCellData("validation points", "confirmationPageTitle", 2));
+        logger.info("Flight Booking is successful");
+        logger.info("Confirmation Title verified successfully");
         Assert.assertTrue(reservationConfirmationPage.validateId());
         System.out.println("The Booking confirmation ID is : " + reservationConfirmationPage.getBookingId());
     }

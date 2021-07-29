@@ -2,7 +2,9 @@ package com.blazeDemo.tests;
 
 import com.blazeDemo.base.TestBase;
 import com.blazeDemo.pages.HomePage;
+import com.blazeDemo.util.ExcelConnector;
 import com.blazeDemo.util.TestUtil;
+import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -14,6 +16,11 @@ import java.io.IOException;
 public class TestHomePage extends TestBase {
     HomePage homePage;
 
+    Logger logger = Logger.getLogger(TestHomePage.class);
+    ExcelConnector excelConnector = new ExcelConnector(System.getProperty("user.dir")
+            + "/src/main/java/com/blazeDemo/config/data.xlsx");
+
+
     public TestHomePage() {
         super();
     }
@@ -22,6 +29,9 @@ public class TestHomePage extends TestBase {
     @BeforeMethod
     public void setUp() {
         TestBase.intialization();
+        logger.info("TestBase Class Initialization method executed successfully");
+        logger.info("Opening Chrome Browser successfully");
+        logger.info("Test Execution Started");
         homePage = new HomePage();
     }
 
@@ -35,14 +45,20 @@ public class TestHomePage extends TestBase {
         if (res.getStatus() == ITestResult.FAILURE || res.getStatus() == ITestResult.SUCCESS) {
             TestUtil.takeScreenshotAtEndOfTest();
         }
-
+        logger.info("Test Execution Completed");
         driver.quit();
+        logger.info("Quitting the browser");
     }
 
     @Test
     public void validateHomePage() {
-        Assert.assertEquals(driver.getTitle(), prop.getProperty("titleOfHomePage"), "Home Page Title is mismatching");
-        Assert.assertEquals(homePage.getHeaderOfHomePage(), prop.getProperty("headerOfHomePage"), "Home Page Header is mismatching");
+        Assert.assertEquals(driver.getTitle(),
+                excelConnector.getCellData("validation points", "titleOfHomePage", 2)
+                , "Home Page Title is mismatching");
+        logger.info("Home Page Title verified successfully");
+        Assert.assertEquals(homePage.getHeaderOfHomePage(),
+                excelConnector.getCellData("validation points", "headerOfHomePage", 2),
+                "Home Page Header is mismatching");
     }
 
 }
